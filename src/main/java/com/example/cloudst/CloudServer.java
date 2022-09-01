@@ -1,4 +1,4 @@
-package com.example.cloudst.server;
+package com.example.cloudst;
 
 import com.example.cloudst.server.handler.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,8 +15,10 @@ public class CloudServer {
     private static final int MAX_OBJ_SIZE = 1024 * 1024 * 100;
 
     public void run() throws InterruptedException {
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)

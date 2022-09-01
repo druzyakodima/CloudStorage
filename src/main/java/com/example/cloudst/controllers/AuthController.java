@@ -33,8 +33,6 @@ public class AuthController {
             startAuth.showErrorAlert("Ошибка ввода", "Поля не должны быть пустыми");
             return;
         }
-
-
     }
 
     @FXML

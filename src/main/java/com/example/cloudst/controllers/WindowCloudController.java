@@ -1,10 +1,5 @@
 package com.example.cloudst.controllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import com.example.cloudst.StartAuth;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +10,11 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class WindowCloudController {
 
@@ -70,5 +70,4 @@ public class WindowCloudController {
     void removeFile(ActionEvent event) {
         localFile.getItems().remove(selectedRecipient);
     }
-
 }

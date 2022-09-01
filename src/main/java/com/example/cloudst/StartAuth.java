@@ -17,6 +17,7 @@ public class StartAuth extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
         primaryStage = stage;
         Client client = new Client();
         client.connect();
@@ -25,6 +26,7 @@ public class StartAuth extends Application {
     }
 
     private void openAuthDialog() throws IOException {
+
         FXMLLoader authLoader = new FXMLLoader(StartAuth.class.getResource("authorization.fxml"));
 
         Stage authStage = new Stage();

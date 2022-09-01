@@ -13,6 +13,7 @@ public class Client {
     private static final int PORT = 8081;
 
     public void connect() {
+
         ObjectEncoderOutputStream oeos = null;
         ObjectDecoderInputStream odis = null;
         try (Socket socket = new Socket(HOST, PORT)){

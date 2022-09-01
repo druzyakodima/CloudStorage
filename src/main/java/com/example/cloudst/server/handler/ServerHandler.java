@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-
     private ByteBuf totalBuf;
 
     @Override
@@ -18,7 +17,6 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext channelHandlerContext, Object msg) {
         ByteBuf inboundMsgBuf = (ByteBuf) msg;
         if (inboundMsgBuf.isReadable()) inboundMsgBuf.writeBytes(totalBuf);
-
     }
 
     @Override
