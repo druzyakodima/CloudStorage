@@ -1,4 +1,4 @@
-package com.example.cloudst;
+package com.example.cloudst.server;
 
 import com.example.cloudst.server.handler.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -25,7 +25,7 @@ public class CloudServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        protected void initChannel(SocketChannel socketChannel) {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(
                                     new ObjectDecoder(MAX_OBJ_SIZE, ClassResolvers.cacheDisabled(null)),
@@ -37,7 +37,7 @@ public class CloudServer {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
-            ChannelFuture channelFuture = serverBootstrap.bind(8081).sync();
+            ChannelFuture channelFuture = serverBootstrap.bind(8080).sync();
             System.out.println("СЕРВЕР ЗАПУЩЕН!");
             System.out.println("-------------------");
             channelFuture.channel().closeFuture().sync();

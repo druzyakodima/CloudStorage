@@ -17,7 +17,7 @@
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="331.0">
                             <children>
-                                <Button layoutX="110.0" layoutY="107.0" mnemonicParsing="false" onAction="#checkAuth" prefHeight="27.0" prefWidth="66.0" style="-fx-background-color: #210fc1;" text="Войти" textFill="#f2f0f0">
+                                <Button layoutX="110.0" layoutY="107.0" mnemonicParsing="false" onAction="#auth" prefHeight="27.0" prefWidth="66.0" style="-fx-background-color: #210fc1;" text="Войти" textFill="#f2f0f0">
                                     <font>
                                         <Font name="System Bold" size="13.0" />
                                     </font>
