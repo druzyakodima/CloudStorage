@@ -5,6 +5,7 @@ module com.example.cloudst {
     requires io.netty.all;
     requires java.sql;
     requires org.xerial.sqlitejdbc;
+    requires log4j;
 
 
     opens com.example.cloudst to javafx.fxml;

@@ -1,15 +1,18 @@
 package com.example.cloudst.authentication;
 
+import com.example.cloudst.alert.AlertEx;
 import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 
 public class DBBaseAuthentication implements Authentication {
 
     private static final String SQLITE_SRC = "jdbc:sqlite:src/main/resources/db/users_auth_reg";
-
+    private final Logger file = Logger.getLogger("file");
     private static Connection connection;
     private static Statement stmt;
+    private AlertEx alert = new AlertEx();
 
     @Override
     public String getUsernameByLoginAndPassword(String login, String password) {
@@ -30,15 +33,20 @@ public class DBBaseAuthentication implements Authentication {
             username = rs.getString("username");
             passwordDB = rs.getString("password");
 
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return ((passwordDB.equals(password))) ? username : null;
+        if (passwordDB.equals(password)) {
+            file.info("Подключился пользователь " + username);
+            return username;
+        } else {
+            file.info("Пользователь пытался подключиться под именем " + username + ", но ввел не верный пароль");
+            return null;
+        }
     }
 
     @SneakyThrows
-    public byte[] getSalt(String login){
+    public byte[] getSalt(String login) {
         byte[] salt = null;
         startAuthentication();
 
@@ -57,7 +65,7 @@ public class DBBaseAuthentication implements Authentication {
     }
 
     @Override
-    public void createUser(String login, String password, String username, byte[] salt) {
+    public boolean createUser(String login, String password, String username, byte[] salt) {
         startAuthentication();
         try {
             PreparedStatement pstmt = connection.prepareStatement("INSERT INTO users_auth (username, login, password, salt) VALUES (?,?,?,?)");
@@ -72,8 +80,12 @@ public class DBBaseAuthentication implements Authentication {
             pstmt.executeBatch();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            alert.showErrorAlert("Ошибка регистрации", "Пользователь с таким логином или имением существует");
+            file.warn("Ошибка регистрации");
+            return false;
         }
+        file.info("Зарегистрировался новый пользователь с именем " + username);
+        return true;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.example.cloudst.server.handler;
 
+import com.example.cloudst.server.hash_password.Hash;
 import com.example.cloudst.server.models.FileRequest;
-import com.example.cloudst.server.models.Hash;
 import com.example.cloudst.server.models.MyFile;
 import com.example.cloudst.server.models.MyMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,8 +51,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private void readFile(Object msg) throws IOException {
         MyFile file = (MyFile) msg;
-        Files.write(Paths.get(getNameServerDir() + "/" + file.getFileName()), file.getData(), StandardOpenOption.CREATE);
-    }
+            Files.write(Paths.get(getNameServerDir() + "/" + file.getFileName()), file.getData(), StandardOpenOption.CREATE);
+        }
+
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {

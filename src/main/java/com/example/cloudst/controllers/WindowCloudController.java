@@ -1,6 +1,7 @@
 package com.example.cloudst.controllers;
 
-import com.example.cloudst.StartAuth;
+import com.example.cloudst.alert.AlertEx;
+import com.example.cloudst.check_size.CheckSize;
 import com.example.cloudst.client.Network;
 import com.example.cloudst.server.handler.ServerHandler;
 import com.example.cloudst.server.models.AbstractFile;
@@ -13,10 +14,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.FileChooser;
+import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,6 +33,8 @@ public class WindowCloudController {
 
     private String selectedRecipient;
 
+    private final long MAX_SIZE_DIR = 5368709120L;
+
     @lombok.Setter
     private Network network;
     private int index;
@@ -46,8 +47,9 @@ public class WindowCloudController {
 
     @lombok.Setter
     @lombok.Getter
-    String nameDir;
+    private String userNameAndNameDir;
 
+    private final Logger file = Logger.getLogger("file");
     @FXML
     void initialize() {
         selectNameFileClickMouse(localFile);
@@ -55,8 +57,8 @@ public class WindowCloudController {
     }
 
     public void refreshFilesListAndNameDir() {
-        setNameServerDir(nameServerDir = "server_storage_" + getNameDir());
-        setNameLocalDir(nameLocalDir = "client_storage_" + getNameDir());
+        setNameServerDir(nameServerDir = "server_storage_" + getUserNameAndNameDir());
+        setNameLocalDir(nameLocalDir = "client_storage_" + getUserNameAndNameDir());
 
         MyMessage message = new MyMessage(getNameServerDir());
         network.sendNameDir(message);
@@ -89,32 +91,33 @@ public class WindowCloudController {
     }
 
     @FXML
-    void selectFile() throws IOException {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Добавить");
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Файлы", "*.jpg", "*.png", "*.gif", "*.bmp", "*.txt", "*.pdf");
-        fileChooser.getExtensionFilters().add(filter);
-        File file = fileChooser.showOpenDialog(StartAuth.javaFXC);
-        if (file != null) {
-            localFile.getItems().add(file.getName());
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                network.addFile(file.getName(), fileInputStream.readAllBytes(), getNameLocalDir());
-            }
-        }
+    void selectFile()  {
+        network.chooseFile(localFile, getNameLocalDir());
     }
+
     @FXML
     void sendFile() {
-        if (selectedRecipient.length() > 0) {
-            try {
-                if (Files.exists(Paths.get(getNameLocalDir() + "/" + selectedRecipient))) {
-                    MyFile myFile = new MyFile(Paths.get(getNameLocalDir() + "/" + selectedRecipient));
-                    network.sendMsg(myFile);
+        long newFileSize = CheckSize.size(Paths.get(getNameLocalDir() + "/" + selectedRecipient));
+        long fullOfMemoryDir = CheckSize.size(Paths.get(getNameServerDir()));
+
+        if (fullOfMemoryDir + newFileSize <  MAX_SIZE_DIR ) {
+            if (selectedRecipient.length() > 0) {
+                try {
+                    if (Files.exists(Paths.get(getNameLocalDir() + "/" + selectedRecipient))) {
+                        MyFile myFile = new MyFile(Paths.get(getNameLocalDir() + "/" + selectedRecipient));
+                        network.sendMsg(myFile);
+                        file.info("Пользователь " + getUserNameAndNameDir() + " отправил файл на сервер");
+                    }
+                } catch (IOException e) {
+                    file.error("Произошла ошибка отправки файла у пользователя " + getUserNameAndNameDir());
+                    throw new RuntimeException(e);
+                } finally {
+                    serverFile.getItems().add(selectedRecipient);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                serverFile.getItems().add(selectedRecipient);
             }
+        } else {
+            AlertEx alert = new AlertEx();
+            alert.showErrorAlert("Ошибка записи файла", "В облачном хранилище не осталось места");
         }
     }
 
@@ -123,15 +126,20 @@ public class WindowCloudController {
     }
 
     @FXML
-    public void removeFile() {
-
+    public void removeLocalFile() {
         if (localFile.getItems().indexOf(selectedRecipient) == index) {
             localFile.getItems().remove(selectedRecipient);
             network.deleteFile(selectedRecipient, getNameLocalDir());
+            file.info("Пользователь " + getNameServerDir() + " удалил файл из локального хранилища " + selectedRecipient);
         }
+    }
+
+    @FXML
+    void removeServerFile() {
         if (serverFile.getItems().indexOf(selectedRecipient) == index) {
             serverFile.getItems().remove(selectedRecipient);
             ServerHandler.deleteFile(selectedRecipient, getNameServerDir());
+            file.info("Пользователь " + getNameServerDir() + " удалил файл из облака " + selectedRecipient);
         }
     }
 
@@ -160,6 +168,7 @@ public class WindowCloudController {
         if (selectedRecipient.length() > 0) {
             network.sendMsg(new FileRequest(selectedRecipient));
             localFile.getItems().add(selectedRecipient);
+            file.info("Пользователь " + getNameServerDir() + " скачал файл из облака " + selectedRecipient);
             selectedRecipient = null;
         }
     }

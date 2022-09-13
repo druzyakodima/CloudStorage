@@ -1,4 +1,4 @@
-package com.example.cloudst.server.models;
+package com.example.cloudst.server.hash_password;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

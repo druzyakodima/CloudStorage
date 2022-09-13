@@ -6,9 +6,9 @@ import com.example.cloudst.controllers.WindowCloudController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.IOException;
 
@@ -28,11 +28,10 @@ public class StartAuth extends Application {
 
         primaryStage = stage;
         network = new Network();
-
+        PropertyConfigurator.configure("src/main/resources/logs/configs/log4j.properties");
         network.connect();
 
         openAuthDialog();
-      //  createChatDialog();
     }
 
     private void openAuthDialog() throws IOException {
@@ -46,7 +45,6 @@ public class StartAuth extends Application {
         authStage.initModality(Modality.WINDOW_MODAL);
         authStage.initOwner(primaryStage);
         authStage.setTitle("Authentication");
-       // authStage.setAlwaysOnTop(true);
         authStage.show();
 
         authController = authLoader.getController();
@@ -54,14 +52,6 @@ public class StartAuth extends Application {
         authController.setNetwork(network);
         authController.setStartClient(this);
     }
-
-    public void showErrorAlert(String title, String error) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(error);
-        alert.show();
-    }
-
     public void createChatDialog() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(StartAuth.class.getResource("windowCloudStorage.fxml"));
 
@@ -75,7 +65,7 @@ public class StartAuth extends Application {
         authStage.close();
         primaryStage.setTitle("Сетевое Хранилище");
         windowCloudController.setUsernameTitle(authController.getUsername());
-        windowCloudController.setNameDir(authController.getUsername());
+        windowCloudController.setUserNameAndNameDir(authController.getUsername());
         windowCloudController.refreshFilesListAndNameDir();
         primaryStage.show();
     }

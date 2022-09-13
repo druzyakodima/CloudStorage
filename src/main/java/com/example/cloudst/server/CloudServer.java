@@ -9,10 +9,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import org.apache.log4j.Logger;
 
 public class CloudServer {
 
     private static final int MAX_OBJ_SIZE = 1024 * 1024 * 100;
+    private final Logger file = Logger.getLogger("file");
 
     public void run() throws InterruptedException {
 
@@ -38,6 +40,7 @@ public class CloudServer {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture channelFuture = serverBootstrap.bind(8080).sync();
+            file.info("Сервер запущен");
             System.out.println("СЕРВЕР ЗАПУЩЕН!");
             System.out.println("-------------------");
             channelFuture.channel().closeFuture().sync();

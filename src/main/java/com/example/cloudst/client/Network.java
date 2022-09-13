@@ -1,12 +1,18 @@
 package com.example.cloudst.client;
 
+import com.example.cloudst.StartAuth;
 import com.example.cloudst.server.models.AbstractFile;
 import com.example.cloudst.server.models.MyMessage;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.application.Platform;
 import javafx.scene.control.ListView;
+import javafx.stage.FileChooser;
+import lombok.SneakyThrows;
+import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -20,8 +26,7 @@ public class Network {
     private ObjectEncoderOutputStream out;
     private ObjectDecoderInputStream in;
     private Socket socket;
-
-    private String username;
+    private final Logger file = Logger.getLogger("file");
 
     public void connect() {
         try {
@@ -74,7 +79,7 @@ public class Network {
 
     public void deleteFile(String name, String nameDir) {
         try {
-            Files.delete(Paths.get(nameDir + name));
+            Files.delete(Paths.get(nameDir + "/"+ name));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,6 +109,22 @@ public class Network {
                     e.printStackTrace();
                 }
             });
+        }
+    }
+
+    @SneakyThrows
+    public void chooseFile(ListView<String> localFile, String getNameLocalDir) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Добавить");
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Файлы", "*.jpg", "*.png", "*.gif", "*.bmp", "*.txt", "*.pdf");
+        fileChooser.getExtensionFilters().add(filter);
+        File addFile = fileChooser.showOpenDialog(StartAuth.javaFXC);
+        if (addFile != null) {
+            localFile.getItems().add(addFile.getName());
+            try (FileInputStream fileInputStream = new FileInputStream(addFile)) {
+                addFile(addFile.getName(), fileInputStream.readAllBytes(), getNameLocalDir);
+                file.info("Пользователь " + getNameLocalDir + " добавил файл из компьютера в локальное хранилище " + file.getName());
+            }
         }
     }
 }

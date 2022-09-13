@@ -1,6 +1,7 @@
 package com.example.cloudst.controllers;
 
 import com.example.cloudst.StartAuth;
+import com.example.cloudst.alert.AlertEx;
 import com.example.cloudst.authentication.DBBaseAuthentication;
 import com.example.cloudst.client.Network;
 import com.example.cloudst.server.handler.ServerHandler;
@@ -8,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -35,9 +37,12 @@ public class AuthController {
     private Network network;
     private DBBaseAuthentication authentication = new DBBaseAuthentication();
 
-    ServerHandler serverHandler = new ServerHandler();
+    private ServerHandler serverHandler = new ServerHandler();
+
+    private AlertEx alert = new AlertEx();
 
     private String username;
+    private final Logger file = Logger.getLogger("file");
 
     public String getUsername() {
         return username;
@@ -54,7 +59,7 @@ public class AuthController {
     public void checkAuth(String login,  String password) {
 
         if (login.length() == 0 || password.length() == 0) {
-            startAuth.showErrorAlert("Ошибка ввода", "Поля не должны быть пустыми");
+            alert.showErrorAlert("Ошибка ввода", "Поля не должны быть пустыми");
             return;
         }
 
@@ -69,7 +74,7 @@ public class AuthController {
             }
             startAuth.openChatDialog();
         } else {
-            startAuth.showErrorAlert("Ошибка аутентификации", "Не правильный пароль или логин");
+            alert.showErrorAlert("Ошибка аутентификации", "Не правильный пароль или логин");
         }
 
     }
@@ -89,10 +94,10 @@ public class AuthController {
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
         String hashPassword =  serverHandler.hashPassword(password,salt);
-        authentication.createUser(login, hashPassword, username, salt);
 
-        checkAuth(login, hashPassword);
-
+        if (authentication.createUser(login, hashPassword, username, salt)) {
+            checkAuth(login, hashPassword);
+        }
     }
 
     public void setUsername(String username) {

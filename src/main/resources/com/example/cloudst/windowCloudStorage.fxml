@@ -15,10 +15,11 @@
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <Button layoutX="121.0" layoutY="10.0" mnemonicParsing="false" onAction="#sendFile" prefHeight="26.0" prefWidth="94.0" text="Переместить" AnchorPane.leftAnchor="121.0" />
-                  <Button layoutX="381.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeFile" prefHeight="26.0" prefWidth="94.0" text="Удалить" AnchorPane.rightAnchor="121.0" />
-                  <Button layoutX="14.0" layoutY="10.0" mnemonicParsing="false" onAction="#selectFile" prefHeight="26.0" prefWidth="94.0" text="Добавить" AnchorPane.leftAnchor="14.0" />
+                  <Button layoutX="210.0" layoutY="10.0" mnemonicParsing="false" onAction="#sendFile" prefHeight="26.0" prefWidth="94.0" text="Переместить" AnchorPane.leftAnchor="210.0" />
+                  <Button layoutX="387.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeServerFile" prefHeight="26.0" prefWidth="94.0" text="Удалить" AnchorPane.rightAnchor="117.80000000000007" />
+                  <Button layoutX="7.0" layoutY="10.0" mnemonicParsing="false" onAction="#selectFile" prefHeight="26.0" prefWidth="94.0" text="Добавить" AnchorPane.leftAnchor="7.0" />
                   <Button layoutX="475.0" layoutY="10.0" mnemonicParsing="false" onAction="#downloadFile" prefHeight="26.0" prefWidth="94.0" text="Скачать" AnchorPane.rightAnchor="14.0" />
+                  <Button layoutX="109.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeLocalFile" prefHeight="26.0" prefWidth="94.0" text="Удалить" />
                </children>
             </AnchorPane>
         </items>
