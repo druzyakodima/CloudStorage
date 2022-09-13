@@ -1,12 +1,21 @@
 package com.example.cloudst.controllers;
 
 import com.example.cloudst.StartAuth;
+import com.example.cloudst.alert.AlertEx;
+import com.example.cloudst.authentication.DBBaseAuthentication;
+import com.example.cloudst.client.Network;
+import com.example.cloudst.server.handler.ServerHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.security.SecureRandom;
 
 public class AuthController {
+
     @FXML
     private TextField loginField;
 
@@ -24,16 +33,49 @@ public class AuthController {
 
     private StartAuth startAuth;
 
+    @lombok.Setter
+    private Network network;
+    private DBBaseAuthentication authentication = new DBBaseAuthentication();
+
+    private ServerHandler serverHandler = new ServerHandler();
+
+    private AlertEx alert = new AlertEx();
+
+    private String username;
+    private final Logger file = Logger.getLogger("file");
+
+    public String getUsername() {
+        return username;
+    }
+
     @FXML
-    void checkAuth(ActionEvent event) {
+    void auth() {
         String login = loginField.getText().trim();
         String password = passwordField.getText().trim();
+        String hashPassword = serverHandler.hashPassword(password,authentication.getSalt(login));
+        checkAuth(login, hashPassword);
+    }
+
+    public void checkAuth(String login,  String password) {
 
         if (login.length() == 0 || password.length() == 0) {
-            startAuth.showErrorAlert("Ошибка ввода", "Поля не должны быть пустыми");
+            alert.showErrorAlert("Ошибка ввода", "Поля не должны быть пустыми");
             return;
         }
 
+        authentication.startAuthentication();
+        String user = authentication.getUsernameByLoginAndPassword(login, password);
+        if (user != null) {
+            setUsername(user);
+            try {
+                startAuth.createChatDialog();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            startAuth.openChatDialog();
+        } else {
+            alert.showErrorAlert("Ошибка аутентификации", "Не правильный пароль или логин");
+        }
 
     }
 
@@ -44,10 +86,26 @@ public class AuthController {
 
     @FXML
     void registration(ActionEvent event) {
+        String username = usernameRegister.getText();
+        String login = loginFieldRegister.getText();
+        String password = passwordRegister.getText();
 
+        byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        String hashPassword =  serverHandler.hashPassword(password,salt);
+
+        if (authentication.createUser(login, hashPassword, username, salt)) {
+            checkAuth(login, hashPassword);
+        }
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setStartClient(StartAuth startAuth) {
         this.startAuth = startAuth;
     }
+
 }
